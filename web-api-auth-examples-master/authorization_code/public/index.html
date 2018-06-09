@@ -157,7 +157,7 @@ $.ajax({
 
  //call gives me everything i need in a single call look into not doing the first call and see how that works out
       $.ajax({
-        url: 'https://api.spotify.com/v1/users/'+ userId +'/playlists/'+playlistID+'/',
+        url: 'https://api.spotify.com/v1/users/'+ userId +'/playlists/'+playlistID+ '/',
         headers: {
     'Authorization': 'Bearer ' + access_token
   },
@@ -218,13 +218,16 @@ $(plWrappingId).append(plButton);
 $(plCardId).append(plTarget);
 $(plCollapseId).append(plCardBody);
 $(plTargetId).append(songList);
-
+var noSpace = pName.replace(/\s/g, '');
+console.log(noSpace);
 //returns back all the tracks per playlist in an array
 console.log(trackList);
 if(trackList){
-$.each(trackList, function(j){
-var tId = trackList[j].track.id;
 
+$.each(trackList, function(j){
+
+var tId = trackList[j].track.id;
+console.log([j]);
 console.log(tId)
 var plTrackList = $('<li>');
 var songToggle = $('<a  data-toggle="collapse"  role="button" aria-expanded="false" >');
@@ -242,21 +245,23 @@ var trackAlbum = $('<td>');
 var trackArtist = $('<td>');
 
 
-var songToggleLink = "link" + tId;
-var songToggler = "collapse" + tId;
-var songInfoDiver = "div" + tId;
-var songInfoTabler = "table" + tId;
-var innerDiv = "inner" + tId;
-var headRow = "head-row" + tId;
-var tableBody = "table-data" + tId;
-var tableAlbum = "album" + tId;
-var tableArtist = "artist" + tId;
-var dataRow = "track" + tId;
-var songAlbum = "sngAlbum" + tId;
-var songArtist = "sngArtist" + tId;
-var tableHead = "head" + tId;
+var plTrack = [j]+noSpace + tId;
+var songToggleLink = [j]+noSpace + "link" + tId;
+var songToggler = [j]+noSpace + "collapse" + tId;
+var songInfoDiver = [j]+noSpace + "div" + tId;
+var songInfoTabler = [j]+noSpace + "table" + tId;
+var innerDiv = [j]+noSpace + "inner" + tId;
+var headRow = [j]+noSpace + "head-row" + tId;
+var tableBody = [j]+noSpace + "table-data" + tId;
+var tableAlbum = [j]+noSpace + "album" + tId;
+var tableArtist = [j]+noSpace + "artist" + tId;
+var dataRow = [j]+noSpace + "track" + tId;
+var songAlbum = [j]+noSpace + "sngAlbum" + tId;
+var songArtist = [j]+noSpace + "sngArtist" + tId;
+var tableHead = [j]+noSpace + "head" + tId;
 
-var plTrackListId = "#" + tId;
+var plTrackListId = "#" + plTrack;
+
 var songToggleId = "#" + songToggler;
 var songToggleLinkId = "#" + songToggleLink;
 var innerDivId = "#" + innerDiv;
@@ -270,7 +275,8 @@ var songAlbumId = "#" + songAlbum;
 var songArtistId = "#" + songArtist;
 var tableHeadId = "#" + tableHead;
 
-plTrackList.attr("id", tId);
+plTrackList.attr("id", plTrack);
+
 songToggle.attr({
   id: songToggleLink,
   href: songToggleId,
@@ -343,13 +349,13 @@ $(songArtistId).text(artist);
        
 
           $.ajax({
-              url: 'https://api.spotify.com/v1/me',
+              url: 'https://api.spotify.com/v1/users/'+ userId +'/playlists/'+ playlistID +'?fields=tracks.items(track(name,href,album(name,href)))',
               headers: {
                 'Authorization': 'Bearer ' + access_token
               },
               success: function(response) {
                 //userProfilePlaceholder.innerHTML = userProfileTemplate(response);
-
+console.log(response);
                $('#login').hide();
                 $('#loggedin').show();
               }
