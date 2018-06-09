@@ -135,11 +135,13 @@ $.ajax({
    $("#dataBody").append(playlistHead);
 
     for(var i = 0; i < playResults.length; i++){
+      (function (i){
+
       var playlistBody = $("<div>");
         playlistBody.attr("id", "playlist" + [i]);
       var pLists = $("<p>");
       var songTracks = $("<div>");
-       
+       console.log(i);
 
         pLists.text(playResults[i].name);
         $("#playlists").append(playlistBody);
@@ -219,10 +221,11 @@ $(plTargetId).append(songList);
 
 //returns back all the tracks per playlist in an array
 console.log(trackList);
+if(trackList){
 $.each(trackList, function(j){
 var tId = trackList[j].track.id;
 
-
+console.log(tId)
 var plTrackList = $('<li>');
 var songToggle = $('<a  data-toggle="collapse"  role="button" aria-expanded="false" >');
 
@@ -232,6 +235,7 @@ var tableHeadRow = $('<tr>');
 var tableHeadArtist = $('<th scope="col">');
 var tableHeadAlbum = $("<th scope='col'>");
 var innerCollapseDiv = $('<div>');
+var trackTableHead =$('<thead>');
 var trackTableBody = $('<tbody>');
 var tableDataRow = $('<tr>');
 var trackAlbum = $('<td>');
@@ -250,6 +254,7 @@ var tableArtist = "artist" + tId;
 var dataRow = "track" + tId;
 var songAlbum = "sngAlbum" + tId;
 var songArtist = "sngArtist" + tId;
+var tableHead = "head" + tId;
 
 var plTrackListId = "#" + tId;
 var songToggleId = "#" + songToggler;
@@ -263,6 +268,7 @@ var tableArtistId = "#" + tableArtist;
 var tableDataRowId = "#" + dataRow;
 var songAlbumId = "#" + songAlbum;
 var songArtistId = "#" + songArtist;
+var tableHeadId = "#" + tableHead;
 
 plTrackList.attr("id", tId);
 songToggle.attr({
@@ -274,14 +280,16 @@ songToggle.attr({
 innerCollapseDiv.attr("id", innerDiv);
 songInfoDiv.attr("id", songToggler);
 songInfoTable.attr("id", songInfoTabler);
+if(tableAlbumId){
 tableHeadAlbum.text("Album").attr("id", tableAlbumId);
 tableHeadArtist.text("Artist").attr("id", tableArtistId);
+}
 tableHeadRow.attr("id", headRow);
 tableDataRow.attr("id", dataRow);
 trackTableBody.attr("id", tableBody);
 trackArtist.attr("id", songArtist);
 trackAlbum.attr("id", songAlbum);
-
+trackTableHead.attr("id", tableHead);
 
 
 
@@ -291,9 +299,15 @@ $(plTrackListId).append(songToggle);
 $(plTrackListId).append(innerCollapseDiv);
 $(innerDivId).append(songInfoDiv);
 $(songToggleId).append(songInfoTable);
-$(songInfoTableId).append(tableHeadRow);
+
+$(songInfoTableId).append(trackTableHead);
+$(tableHeadId).append(tableHeadRow);
+
 $(headRowId).append(tableHeadArtist);
 $(headRowId).append(tableHeadAlbum);
+
+
+
 $(songInfoTableId).append(trackTableBody);
 $(tableBodyId).append(tableDataRow);
 $(tableDataRowId).append(trackArtist);
@@ -314,12 +328,12 @@ $(songArtistId).text(artist);
 
  
 })
-
-  }
+}
+  }  
   
 })
-
-      }
+}(i))
+}
       
 
     $('#login').hide();
