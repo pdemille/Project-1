@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css?family=Abril+Fatface" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
-    
+  
     
 
 
@@ -28,11 +28,22 @@
           white-space: nowrap;
           width: 500px;
         }
+        #sizeModal{
+          max-width: 1200px;
+         
+        }
+        
+
+
       </style>
 
   </head>
 
   <div class="container" id="head-container">
+      
+      
+
+
         <div class="container">
                 <div id="login">
                   <h1>This is an example of the Authorization Code flow</h1>
@@ -43,7 +54,7 @@
                   </div>
                   <div id="oauth">
                   </div>
-                  <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
+                  
                 </div>
               </div>
     <div class="jumbotron" id="head">
@@ -70,6 +81,19 @@
       </table>
   </div>
 
+  <div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="videoModal" aria-hidden="true">
+      <div class="modal-dialog" id="sizeModal">
+        <div class="modal-content">
+          <div class="modal-body">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <div>
+              <iframe width="100%" height="800" src=""></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   <div class="panel panel-default">
     <div class="panel-heading panel-custom">  Add Song </div>
     <div class="panel-body">
@@ -95,6 +119,7 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
   <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
   <script>
+    
     (function() {
 
       /**
@@ -110,7 +135,8 @@
         }
         return hashParams;
       }
-
+var songPlaying = false;
+var audioReady = false;
       var params = getHashParams();
 
       var access_token = params.access_token,
@@ -219,7 +245,7 @@ $(plCardId).append(plTarget);
 $(plCollapseId).append(plCardBody);
 $(plTargetId).append(songList);
 var noSpace = pName.replace(/\s/g, '');
-console.log(noSpace);
+
 //returns back all the tracks per playlist in an array
 console.log(trackList);
 if(trackList){
@@ -227,8 +253,7 @@ if(trackList){
 $.each(trackList, function(j){
 
 var tId = trackList[j].track.id;
-console.log([j]);
-console.log(tId)
+
 var plTrackList = $('<li>');
 var songToggle = $('<a  data-toggle="collapse"  role="button" aria-expanded="false" >');
 
@@ -243,7 +268,15 @@ var trackTableBody = $('<tbody>');
 var tableDataRow = $('<tr>');
 var trackAlbum = $('<td>');
 var trackArtist = $('<td>');
-
+var mvButton = $('<button class="btn btn-primary music-video">')
+var tableWrap = $('<div>');
+var trackButton = $('<td>');
+var trackPreview = $('<td>');
+var albumImg = $('<img class="img-thumbnail">');
+//var trackPlay = $('<button class="btn btn-primary preview">');
+  //in css its possible to change size of controls so it only displays play button
+var audioClip = $('<audio controls preload="auto">');
+var playerAudio = $('<source>');
 
 var plTrack = [j]+noSpace + tId;
 var songToggleLink = [j]+noSpace + "link" + tId;
@@ -259,9 +292,17 @@ var dataRow = [j]+noSpace + "track" + tId;
 var songAlbum = [j]+noSpace + "sngAlbum" + tId;
 var songArtist = [j]+noSpace + "sngArtist" + tId;
 var tableHead = [j]+noSpace + "head" + tId;
+var mvBtn = [j]+noSpace + "song" + tId;
+var tableWrapper  = [j]+noSpace + "wrap" + tId;
+var tableButton  = [j]+noSpace + "button" + tId;
+var albumArt = [j]+noSpace + "art" + tId;
+var songPreview = [j]+noSpace + "preview" + tId;
+//var songPlay = [j]+noSpace + "play" + tId;
+var songClip = [j]+noSpace + "clip" + tId;
+var aPlayer = [j]+noSpace + "player" + tId;
 
 var plTrackListId = "#" + plTrack;
-
+var mvBtnId = "#" + mvBtn;
 var songToggleId = "#" + songToggler;
 var songToggleLinkId = "#" + songToggleLink;
 var innerDivId = "#" + innerDiv;
@@ -274,9 +315,15 @@ var tableDataRowId = "#" + dataRow;
 var songAlbumId = "#" + songAlbum;
 var songArtistId = "#" + songArtist;
 var tableHeadId = "#" + tableHead;
+var tableButtonId  = "#" + tableButton;
+var tableWrapperId = "#" + tableWrapper;
+var albumArtId = "#" + albumArt;
+var songPreviewId = "#" + songPreview;
+//var songPlayId = "#" + songPlay;
+var songClipId = "#" + songClip;
+var aPlayerId = "#" + aPlayer;
 
 plTrackList.attr("id", plTrack);
-
 songToggle.attr({
   id: songToggleLink,
   href: songToggleId,
@@ -296,42 +343,63 @@ trackTableBody.attr("id", tableBody);
 trackArtist.attr("id", songArtist);
 trackAlbum.attr("id", songAlbum);
 trackTableHead.attr("id", tableHead);
-
-
-
+mvButton.attr("id", mvBtn);
+tableWrap.attr("id", tableWrapper);
+trackButton.attr("id", tableButton);
+albumImg.attr("id", albumArt);
+trackPreview.attr("id", songPreview);
+//trackPlay.attr("id", songPlay).text("Play Song");
+audioClip.attr("id", songClip);
+playerAudio.attr("id", aPlayer);
 
 $(plSongListId).append(plTrackList);
 $(plTrackListId).append(songToggle);
 $(plTrackListId).append(innerCollapseDiv);
 $(innerDivId).append(songInfoDiv);
-$(songToggleId).append(songInfoTable);
-
+$(songToggleId).append(tableWrap);
+$(tableWrapperId).append(songInfoTable);
 $(songInfoTableId).append(trackTableHead);
 $(tableHeadId).append(tableHeadRow);
-
 $(headRowId).append(tableHeadArtist);
 $(headRowId).append(tableHeadAlbum);
-
-
-
 $(songInfoTableId).append(trackTableBody);
 $(tableBodyId).append(tableDataRow);
 $(tableDataRowId).append(trackArtist);
 $(tableDataRowId).append(trackAlbum);
+$(tableDataRowId).append(trackPreview);
+$(tableDataRowId).append(trackButton);
+$(tableButtonId).append(mvButton);
+$(tableWrapperId).prepend(albumImg);
+//$(songPreviewId).append(trackPlay);
+$(songPreviewId).append(audioClip);
+$(songClipId).append(playerAudio);
 
 var title = trackList[j].track.name;
 var album = trackList[j].track.album.name;
  //figure out what to do if there is more than one artist in the artist array
 var artist = trackList[j].track.artists[0].name;
+var albumArtImg = trackList[j].track.album.images[1].url;
+var videoSearchValue =  artist + title + " official";
+var previewClip = trackList[j].track.preview_url;
 
 $(songToggleLinkId).text(title);
 $(songAlbumId).text(album);
 $(songArtistId).text(artist);
- 
-
-
- 
-
+$(mvBtnId).text("Music Video").attr({
+  "data-toggle": "modal",
+   "data-target": "#videoModal",
+   "data-video": videoSearchValue
+}); 
+$(albumArtId).attr("src", albumArtImg);
+//$(songPlayId).attr({
+  //"data-value": previewClip,
+  //"type": "button",
+ // "data-toggle": "button",
+  //"aria-pressed": "false",
+  //"autocomplete": "off"
+//});
+//$(songClipId).attr("src", previewClip);
+$(aPlayerId).attr("src", previewClip);
  
 })
 }
@@ -340,50 +408,120 @@ $(songArtistId).text(artist);
 })
 }(i))
 }
-      
+
+
+
+//$(document).ready(function(){
+  
+//});
+
+document.addEventListener('play', function(e){
+  var audios = document.getElementsByTagName('audio');
+  for(var i = 0, len = audios.length; i < len; i++){
+    if(audios[i] != e.target) {
+      audios[i].pause();
+    }
+  }
+}, true);
+
+
 
     $('#login').hide();
     $('#loggedin').show();
   }
 });
-       
 
-          $.ajax({
-              url: 'https://api.spotify.com/v1/users/'+ userId +'/playlists/'+ playlistID +'?fields=tracks.items(track(name,href,album(name,href)))',
-              headers: {
-                'Authorization': 'Bearer ' + access_token
-              },
-              success: function(response) {
-                //userProfilePlaceholder.innerHTML = userProfileTemplate(response);
-console.log(response);
-               $('#login').hide();
-                $('#loggedin').show();
-              }
-          });
+
         } else {
+    
             // render initial screen
             $('#login').show();
             $('#loggedin').hide();
         }
-
-        document.getElementById('obtain-new-token').addEventListener('click', function() {
-          $.ajax({
-            url: '/refresh_token',
-            data: {
-              'refresh_token': refresh_token
-            }
-          }).done(function(data) {
-            access_token = data.access_token;
-            //oauthPlaceholder.innerHTML = oauthTemplate({
-              //access_token: access_token,
-             // refresh_token: refresh_token
-           // });
-          });
-        }, false);
+      
+        //document.getElementById('obtain-new-token').addEventListener('click', function() {
+        //  $.ajax({
+        //    url: '/refresh_token',
+        //    data: {
+        //      'refresh_token': refresh_token
+        //    }
+        //  }).done(function(data) {
+        //    access_token = data.access_token;
+        //    //oauthPlaceholder.innerHTML = oauthTemplate({
+        //      //access_token: access_token,
+        //     // refresh_token: refresh_token
+        //   // });
+        //  });
+        //}, false);
       }
     })();
+  
+    $(document).ready(function() {
+      $(document).on("click", ".music-video", function(){
+       var searchValue = $(this).data("video");
+       console.log(searchValue);
+       var buttonId = $(this).attr("id");
+       console.log(buttonId);
+       function start() {
+  // 2. Initialize the JavaScript client library.
+  gapi.client.init({
+    'apiKey': 'AIzaSyB8OV4TyFEjIy3hIFgA8ol7RIHb7KTvt8U',
+    URL: 'https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=overdoseOfficial&type=video&key=AIzaSyB8OV4TyFEjIy3hIFgA8ol7RIHb7KTvt8U'
+  }).then(function(response) {
+    // 3. Initialize and make the API request.
+    return gapi.client.request({
+      'path': "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=" + searchValue + "&type=video&key=AIzaSyB8OV4TyFEjIy3hIFgA8ol7RIHb7KTvt8U",
+    })
+  }).then(function(response) {
+    console.log(response.result);
+    console.log(this);
+    searchVidId = response.result.items[0].id.videoId;
+   console.log(buttonId);
+    $("#" + buttonId).attr('data-theVideo', searchVidId);
+    autoPlayYouTubeModal(buttonId);
+  }, function(reason) {
+    console.log('Error: ' + reason.result.error.message);
+  });
+};
+// 1. Load the JavaScript client library.
+gapi.load('client', start);
+
+  }) 
+
+function autoPlayYouTubeModal(buttonId){
+  
+    var theModal = $("#" + buttonId).data( "target" ),
+    videoSRC = $("#" + buttonId).attr( "data-thevideo" ),  
+    videoSRCauto = "http://www.youtube.com/embed/" + videoSRC + "?html5=1";
+    console.log(videoSRC);
+    console.log(videoSRCauto);
+    $(theModal+' iframe').attr('src', videoSRCauto);
+    $(theModal+' button.close').click(function () {
+        $(theModal+' iframe').attr('src', videoSRC);
+       
+  });
+}
+    })
+
+
+
+
+ 
+
+
+
+    // After the API loads, call a function to enable the search box.
+
+
+    
+   
   </script>
 
+
+<script>
+  
+
+</script>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
 
