@@ -491,7 +491,7 @@ function autoPlayYouTubeModal(buttonId){
   
     var theModal = $("#" + buttonId).data( "target" ),
     videoSRC = $("#" + buttonId).attr( "data-thevideo" ),  
-    videoSRCauto = "http://www.youtube.com/embed/" + videoSRC + "?html5=1";
+    videoSRCauto = "https://www.youtube.com/embed/" + videoSRC + "?html5=1";
     console.log(videoSRC);
     console.log(videoSRCauto);
     $(theModal+' iframe').attr('src', videoSRCauto);
