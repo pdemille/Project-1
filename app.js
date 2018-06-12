@@ -46,7 +46,7 @@ var stateKey = 'spotify_auth_state';
 
 var app = express();
 
-app.use(express.static(__dirname + './web-api-auth-examples-master/authorization_code/public/assets'))
+app.use(express.static(__dirname + './web-api-auth-examples-master/authorization_code/public/'))
    .use(cors())
    .use(cookieParser());
 
