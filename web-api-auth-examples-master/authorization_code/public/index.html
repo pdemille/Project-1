@@ -365,7 +365,10 @@ songToggle.attr({
  });
 
 innerCollapseDiv.attr("id", innerDiv);
-songInfoDiv.attr("id", songToggler);
+songInfoDiv.attr({
+  id: songToggler,
+  "data-parent": plSongListId
+});
 songInfoTable.attr("id", songInfoTabler);
 if(tableAlbumId){
 tableHeadAlbum.text("Album").attr("id", tableAlbumId);
