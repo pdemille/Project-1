@@ -20,12 +20,15 @@ var client_secret = config.client_secret; // Your secret
 console.log(client_id)
 console.log(client_secret)
 var redirect_uri;
-if(process.env.NODE_ENV === "production") {
-  redirect_uri = "https://nameless-stream-63268.herokuapp.com/callback";
-} else if (process.env.NODE_ENV === "development"){
- redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
-}
+console.log(process.env.NODE_ENV);
 
+process.env.NODE_ENV === "production" ? redirect_uri = "https://nameless-stream-63268.herokuapp.com/callback" : redirect_uri = 'http://localhost:8888/callback'
+// if(process.env.NODE_ENV === "production") {
+//   redirect_uri = "https://nameless-stream-63268.herokuapp.com/callback";
+// } else{
+//  redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
+// }
+console.log(redirect_uri)
 
 /**
  * Generates a random string containing numbers and letters
