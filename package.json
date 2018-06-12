@@ -1,0 +1,28 @@
+{
+  "author": "Spotify",
+  "name": "project-1",
+  "description": "Basic examples of the Spotify authorization flows through OAuth 2",
+  "version": "0.0.2",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.3",
+    "cors": "^2.8.4",
+    "express": "~4.16.0",
+    "path": "^0.12.7",
+    "querystring": "~0.2.0",
+    "request": "~2.83.0"
+  },
+  "main": "app.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pdemille/Project-1.git"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pdemille/Project-1/issues"
+  },
+  "homepage": "https://github.com/pdemille/Project-1#readme"
+}

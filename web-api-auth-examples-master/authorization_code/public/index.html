@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    
+    <!--link rel="stylesheet" type="text/css" href="assets/css/style.css"-->
+    <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Abril+Fatface" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <!--link rel="stylesheet" type="text/css" href="assets/css/style.css"-->
+    
+
+
+    <title>Delta</title>
+
+    <style type="text/css">
+        #login, #loggedin {
+          display: none;
+        }
+        .text-overflow {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          width: 500px;
+        }
+        #sizeModal{
+          max-width: 1200px;
+         
+        }
+        
+        #head-container {
+    margin-top: 1%; 
+    background: none;
+  }
+  
+  .jumbotron {
+    font-family: 'Abril Fatface', cursive;
+    letter-spacing: 7px;    
+    background: none;
+  }
+  
+  #head {
+    text-align: center;
+    color: Black;
+    padding: 2%;
+    background: none;
+  }
+
+  h1 {
+    font-size: 80px;
+    padding-bottom: 1%;
+  }
+  
+  h2 {
+    font-size: 65px;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+      </style>
+
+  </head>
+
+  <div class="container" id="head-container">
+      
+      
+
+
+        <div class="container">
+                <div id="login">
+                  
+                  <a href="/login" class="btn btn-primary">Log in with Spotify</a>
+                </div>
+                <div id="loggedin">
+                  <div id="user-profile">
+                  </div>
+                  <div id="oauth">
+                  </div>
+                  
+                </div>
+              </div>
+    <div class="jumbotron" id="head">
+        <h1> SpoTube </h1>
+        <h3>Music Refined</h3>
+    </div>
+</div>
+
+<div class="container" id="dataBody">
+  
+  <div class="panel panel-default">
+      <div class="panel-heading panel-custom">
+          Playlists
+      </div>
+      <table class="table table-hover">
+          <tr>
+              <th scope="col">Title</th>
+              <th scope="col">Artist</th>
+              <th scope="col">Album</th>
+              <th scope="col"></th>
+              
+          </tr>
+          <tbody id="table-data"></tbody>
+      </table>
+  </div>
+
+  <div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="videoModal" aria-hidden="true">
+      <div class="modal-dialog" id="sizeModal">
+        <div class="modal-content">
+          <div class="modal-body">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <div>
+              <iframe width="100%" height="800" src=""></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading panel-custom">  Add Song </div>
+    <div class="panel-body">
+        <form>
+            <div class="form-group">
+                <label for="endYear">Search</label>
+                <input type="text" class="form-control" id="time-freq">
+            </div>
+            <div class="btn-group" role="group">
+                <button type="button" id="btn-add" class="btn search-button">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script id="oauth-template" type="text/x-handlebars-template">
+    <h2>oAuth info</h2>
+    <dl class="dl-horizontal">
+      <dt>Access token</dt><dd class="text-overflow">{{access_token}}</dd>
+      <dt>Refresh token</dt><dd class="text-overflow">{{refresh_token}}</dd>
+    </dl>
+  </script>
+  
+  <script>
+    
+    (function() {
+
+      /**
+       * Obtains parameters from the hash of the URL
+       * @return Object
+       */
+      function getHashParams() {
+        var hashParams = {};
+        var e, r = /([^&;=]+)=?([^&;]*)/g,
+            q = window.location.hash.substring(1);
+        while ( e = r.exec(q)) {
+           hashParams[e[1]] = decodeURIComponent(e[2]);
+        }
+        return hashParams;
+      }
+var songPlaying = false;
+var audioReady = false;
+      var params = getHashParams();
+
+      var access_token = params.access_token,
+          refresh_token = params.refresh_token,
+          error = params.error;
+
+      if (error) {
+        alert('There was an error during the authentication');
+      } else {
+        if (access_token) {
+        
+$.ajax({
+  url: 'https://api.spotify.com/v1/me/playlists',
+  headers: {
+    'Authorization': 'Bearer ' + access_token
+  },
+  success: function(response) {
+    console.log(response);
+   var playResults = response.items;
+    console.log(playResults);
+    var playlistHead = $('<div class="accordion" id="accordionPlaylists">');
+   $("#dataBody").append(playlistHead);
+
+    for(var i = 0; i < playResults.length; i++){
+      (function (i){
+
+      var playlistBody = $("<div>");
+        playlistBody.attr("id", "playlist" + [i]);
+      var pLists = $("<p>");
+      var songTracks = $("<div>");
+       console.log(i);
+
+        pLists.text(playResults[i].name);
+        $("#playlists").append(playlistBody);
+        $("#playlist"+[i]).append(pLists);
+        $("#playlist"+[i]).append(songTracks);
+        
+        playlistID = playResults[i].id;
+        userId = playResults[i].owner.id;
+        trackCount = playResults[i].tracks.total;
+ console.log(trackCount)
+
+
+
+ //call gives me everything i need in a single call look into not doing the first call and see how that works out
+      $.ajax({
+        url: 'https://api.spotify.com/v1/users/'+ userId +'/playlists/'+playlistID+ '/',
+        headers: {
+    'Authorization': 'Bearer ' + access_token
+  },
+  success: function(result) {
+    console.log(result);
+    var pName = result.name;
+    console.log(pName);
+    var pId = result.id;
+    var trackName = result.tracks
+    console.log(trackName);
+    var trackList = result.tracks.items;
+    console.log(trackList);
+
+var plCard = $('<div class="card">');
+var plCardHead = $('<div class="card-header">');
+var plWrap = $('<h5 class="mb-0">');
+var plButton = $('<a class="display-4"  data-toggle="collapse"  aria-expanded="false" >');
+    
+var plTarget = $('<div class="collapse" data-parent="#accordionPlaylists">');
+var plCardBody = $('<div class="card-body">');
+var songList = $("<ul>");
+
+var plHeading = "heading" + pId;
+var plWrapping = "wrapping" + pId;  //h5
+var plCollapse = "collapse" + pId;
+var plTargeted = "target" + pId;
+var plSongList = "list" + pId;
+
+var plCardId = "#"+ pId;
+var plHeadingId = "#" + plHeading;
+var plWrappingId = "#" + plWrapping;
+var plCollapseId = "#" + plCollapse;
+var plTargetId = "#" + plTargeted;
+var plSongListId = "#" + plSongList;
+
+plCard.attr("id", pId);
+plCardHead.attr("id", plHeading);
+plWrap.attr("id", plWrapping);
+plButton.attr({
+  href: plCollapseId,
+  "data-target": plCollapseId,
+  "aria-controls": plCollapse
+});
+
+
+plTarget.attr({
+  id: plCollapse,
+  "aria-labelledby": plHeading
+});
+plCardBody.attr("id", plTargeted);
+songList.attr("id", plSongList);
+$(plButton).text(pName);
+$("#accordionPlaylists").append(plCard);
+$(plCardId).append(plCardHead);
+$(plHeadingId).append(plWrap);
+
+$(plWrappingId).append(plButton);
+$(plCardId).append(plTarget);
+$(plCollapseId).append(plCardBody);
+$(plTargetId).append(songList);
+var noSpace = pName.replace(/\s/g, '');
+
+//returns back all the tracks per playlist in an array
+console.log(trackList);
+if(trackList){
+
+$.each(trackList, function(j){
+
+var tId = trackList[j].track.id;
+
+var plTrackList = $('<li>');
+var songToggle = $('<a  data-toggle="collapse"  role="button" aria-expanded="false" >');
+
+var songInfoDiv = $('<div class="collapse">');
+var songInfoTable = $('<table class="table table-hover">');
+var tableHeadRow = $('<tr>');
+var tableHeadArtist = $('<th scope="col">');
+var tableHeadAlbum = $("<th scope='col'>");
+var innerCollapseDiv = $('<div>');
+var trackTableHead =$('<thead>');
+var trackTableBody = $('<tbody>');
+var tableDataRow = $('<tr>');
+var trackAlbum = $('<td>');
+var trackArtist = $('<td>');
+var mvButton = $('<button class="btn btn-primary music-video">')
+var tableWrap = $('<div>');
+var trackButton = $('<td>');
+var trackPreview = $('<td>');
+var albumImg = $('<img class="img-thumbnail">');
+//var trackPlay = $('<button class="btn btn-primary preview">');
+  //in css its possible to change size of controls so it only displays play button
+var audioClip = $('<audio controls preload="auto">');
+var playerAudio = $('<source>');
+
+var plTrack = [j]+noSpace + tId;
+var songToggleLink = [j]+noSpace + "link" + tId;
+var songToggler = [j]+noSpace + "collapse" + tId;
+var songInfoDiver = [j]+noSpace + "div" + tId;
+var songInfoTabler = [j]+noSpace + "table" + tId;
+var innerDiv = [j]+noSpace + "inner" + tId;
+var headRow = [j]+noSpace + "head-row" + tId;
+var tableBody = [j]+noSpace + "table-data" + tId;
+var tableAlbum = [j]+noSpace + "album" + tId;
+var tableArtist = [j]+noSpace + "artist" + tId;
+var dataRow = [j]+noSpace + "track" + tId;
+var songAlbum = [j]+noSpace + "sngAlbum" + tId;
+var songArtist = [j]+noSpace + "sngArtist" + tId;
+var tableHead = [j]+noSpace + "head" + tId;
+var mvBtn = [j]+noSpace + "song" + tId;
+var tableWrapper  = [j]+noSpace + "wrap" + tId;
+var tableButton  = [j]+noSpace + "button" + tId;
+var albumArt = [j]+noSpace + "art" + tId;
+var songPreview = [j]+noSpace + "preview" + tId;
+//var songPlay = [j]+noSpace + "play" + tId;
+var songClip = [j]+noSpace + "clip" + tId;
+var aPlayer = [j]+noSpace + "player" + tId;
+
+var plTrackListId = "#" + plTrack;
+var mvBtnId = "#" + mvBtn;
+var songToggleId = "#" + songToggler;
+var songToggleLinkId = "#" + songToggleLink;
+var innerDivId = "#" + innerDiv;
+var headRowId = "#" + headRow;
+var songInfoTableId = "#" + songInfoTabler;
+var tableBodyId = "#" + tableBody;
+var tableAlbumId = "#" + tableAlbum;
+var tableArtistId = "#" + tableArtist;
+var tableDataRowId = "#" + dataRow;
+var songAlbumId = "#" + songAlbum;
+var songArtistId = "#" + songArtist;
+var tableHeadId = "#" + tableHead;
+var tableButtonId  = "#" + tableButton;
+var tableWrapperId = "#" + tableWrapper;
+var albumArtId = "#" + albumArt;
+var songPreviewId = "#" + songPreview;
+//var songPlayId = "#" + songPlay;
+var songClipId = "#" + songClip;
+var aPlayerId = "#" + aPlayer;
+
+plTrackList.attr("id", plTrack);
+songToggle.attr({
+  id: songToggleLink,
+  href: songToggleId,
+  "aria-controls": songToggler
+ });
+
+innerCollapseDiv.attr("id", innerDiv);
+songInfoDiv.attr("id", songToggler);
+songInfoTable.attr("id", songInfoTabler);
+if(tableAlbumId){
+tableHeadAlbum.text("Album").attr("id", tableAlbumId);
+tableHeadArtist.text("Artist").attr("id", tableArtistId);
+}
+tableHeadRow.attr("id", headRow);
+tableDataRow.attr("id", dataRow);
+trackTableBody.attr("id", tableBody);
+trackArtist.attr("id", songArtist);
+trackAlbum.attr("id", songAlbum);
+trackTableHead.attr("id", tableHead);
+mvButton.attr("id", mvBtn);
+tableWrap.attr("id", tableWrapper);
+trackButton.attr("id", tableButton);
+albumImg.attr("id", albumArt);
+trackPreview.attr("id", songPreview);
+//trackPlay.attr("id", songPlay).text("Play Song");
+audioClip.attr("id", songClip);
+playerAudio.attr("id", aPlayer);
+
+$(plSongListId).append(plTrackList);
+$(plTrackListId).append(songToggle);
+$(plTrackListId).append(innerCollapseDiv);
+$(innerDivId).append(songInfoDiv);
+$(songToggleId).append(tableWrap);
+$(tableWrapperId).append(songInfoTable);
+$(songInfoTableId).append(trackTableHead);
+$(tableHeadId).append(tableHeadRow);
+$(headRowId).append(tableHeadArtist);
+$(headRowId).append(tableHeadAlbum);
+$(songInfoTableId).append(trackTableBody);
+$(tableBodyId).append(tableDataRow);
+$(tableDataRowId).append(trackArtist);
+$(tableDataRowId).append(trackAlbum);
+$(tableDataRowId).append(trackPreview);
+$(tableDataRowId).append(trackButton);
+$(tableButtonId).append(mvButton);
+$(tableWrapperId).prepend(albumImg);
+//$(songPreviewId).append(trackPlay);
+$(songPreviewId).append(audioClip);
+$(songClipId).append(playerAudio);
+
+var title = trackList[j].track.name;
+var album = trackList[j].track.album.name;
+ //figure out what to do if there is more than one artist in the artist array
+var artist = trackList[j].track.artists[0].name;
+var albumArtImg = trackList[j].track.album.images[1].url;
+var videoSearchValue =  artist + title + " official";
+var previewClip = trackList[j].track.preview_url;
+
+$(songToggleLinkId).text(title);
+$(songAlbumId).text(album);
+$(songArtistId).text(artist);
+$(mvBtnId).text("Music Video").attr({
+  "data-toggle": "modal",
+   "data-target": "#videoModal",
+   "data-video": videoSearchValue
+}); 
+$(albumArtId).attr("src", albumArtImg);
+//$(songPlayId).attr({
+  //"data-value": previewClip,
+  //"type": "button",
+ // "data-toggle": "button",
+  //"aria-pressed": "false",
+  //"autocomplete": "off"
+//});
+//$(songClipId).attr("src", previewClip);
+$(aPlayerId).attr("src", previewClip);
+ 
+})
+}
+  }  
+  
+})
+}(i))
+}
+
+
+
+//$(document).ready(function(){
+  
+//});
+
+document.addEventListener('play', function(e){
+  var audios = document.getElementsByTagName('audio');
+  for(var i = 0, len = audios.length; i < len; i++){
+    if(audios[i] != e.target) {
+      audios[i].pause();
+    }
+  }
+}, true);
+
+
+
+    $('#login').hide();
+    $('#loggedin').show();
+  }
+});
+
+
+        } else {
+    
+            // render initial screen
+            $('#login').show();
+            $('#loggedin').hide();
+        }
+      
+        //document.getElementById('obtain-new-token').addEventListener('click', function() {
+        //  $.ajax({
+        //    url: '/refresh_token',
+        //    data: {
+        //      'refresh_token': refresh_token
+        //    }
+        //  }).done(function(data) {
+        //    access_token = data.access_token;
+        //    //oauthPlaceholder.innerHTML = oauthTemplate({
+        //      //access_token: access_token,
+        //     // refresh_token: refresh_token
+        //   // });
+        //  });
+        //}, false);
+      }
+    })();
+  
+    $(document).ready(function() {
+      $(document).on("click", ".music-video", function(){
+       var searchValue = $(this).data("video");
+       console.log(searchValue);
+       var buttonId = $(this).attr("id");
+       console.log(buttonId);
+       function start() {
+  // 2. Initialize the JavaScript client library.
+  gapi.client.init({
+    'apiKey': 'AIzaSyB8OV4TyFEjIy3hIFgA8ol7RIHb7KTvt8U',
+    URL: 'https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=overdoseOfficial&type=video&key=AIzaSyB8OV4TyFEjIy3hIFgA8ol7RIHb7KTvt8U'
+  }).then(function(response) {
+    // 3. Initialize and make the API request.
+    return gapi.client.request({
+      'path': "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=" + searchValue + "&type=video&key=AIzaSyB8OV4TyFEjIy3hIFgA8ol7RIHb7KTvt8U",
+    })
+  }).then(function(response) {
+    console.log(response.result);
+    console.log(this);
+    searchVidId = response.result.items[0].id.videoId;
+   console.log(buttonId);
+    $("#" + buttonId).attr('data-theVideo', searchVidId);
+    autoPlayYouTubeModal(buttonId);
+  }, function(reason) {
+    console.log('Error: ' + reason.result.error.message);
+  });
+};
+// 1. Load the JavaScript client library.
+gapi.load('client', start);
+
+  }) 
+
+function autoPlayYouTubeModal(buttonId){
+  
+    var theModal = $("#" + buttonId).data( "target" ),
+    videoSRC = $("#" + buttonId).attr( "data-thevideo" ),  
+    videoSRCauto = "https://www.youtube.com/embed/" + videoSRC + "?html5=1";
+    console.log(videoSRC);
+    console.log(videoSRCauto);
+    $(theModal+' iframe').attr('src', videoSRCauto);
+    $(theModal+' button.close').click(function () {
+        $(theModal+' iframe').attr('src', videoSRC);
+       
+  });
+}
+    })
+
+
+
+
+ 
+
+
+
+    // After the API loads, call a function to enable the search box.
+
+
+    
+   
+  </script>
+
+
+<script>
+  
+
+</script>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+   
+</html>
