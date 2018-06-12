@@ -12,7 +12,7 @@ var request = require('request'); // "Request" library
 var cors = require('cors');
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
-var path = require('path');
+var path = require("path");
 var config = require("./config.js");
 console.log(config)
 var client_id = config.client_id; // Your client id
@@ -49,7 +49,7 @@ var stateKey = 'spotify_auth_state';
 
 var app = express();
 
-app.use(express.static(__dirname + './web-api-auth-examples-master/authorization_code/public/'))
+app.use(express.static(__dirname + './web-api-auth-examples-master/authorization_code/public'))    
    .use(cors())
    .use(cookieParser());
 
@@ -63,7 +63,7 @@ app.get('/login', function(req, res) {
   res.cookie(stateKey, state);
 
   // your application requests authorization
-  var scope = 'user-read-private user-read-email playlist-read-private';
+  var scope = 'user-read-private user-read-email playlist-read-private playlist-modify-private streaming playlist-modify-public';
   res.redirect('https://accounts.spotify.com/authorize?' +
     querystring.stringify({
       response_type: 'code',
