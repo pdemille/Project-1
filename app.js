@@ -12,11 +12,18 @@ var request = require('request'); // "Request" library
 var cors = require('cors');
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
-var path = require('path')
+var path = require('path');
+require("./config.js");
 
-var client_id = 'fd26699e51ae4236bf113ad5baf74682'; // Your client id
-var client_secret = '6d763b1f910844e0b82afb057480d860'; // Your secret
-var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
+var client_id = config.client_id; // Your client id
+var client_secret = config.client_secret; // Your secret
+var redirect_uri;
+if(process.env.NODE === "production") {
+  redirect_uri = "https://nameless-stream-63268.herokuapp.com/callback";
+} else {
+ redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
+}
+
 
 /**
  * Generates a random string containing numbers and letters
