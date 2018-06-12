@@ -13,10 +13,12 @@ var cors = require('cors');
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 var path = require('path');
-require("./config.js");
-
+var config = require("./config.js");
+console.log(config)
 var client_id = config.client_id; // Your client id
 var client_secret = config.client_secret; // Your secret
+console.log(client_id)
+console.log(client_secret)
 var redirect_uri;
 if(process.env.NODE_ENV === "production") {
   redirect_uri = "https://nameless-stream-63268.herokuapp.com/callback";

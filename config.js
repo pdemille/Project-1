@@ -3,3 +3,4 @@ var config = {
     client_secret: '6d763b1f910844e0b82afb057480d860',
     "apiKey": 'AIzaSyB8OV4TyFEjIy3hIFgA8ol7RIHb7KTvt8U'
 }
+module.exports = config;
