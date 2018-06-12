@@ -18,7 +18,7 @@ require("./config.js");
 var client_id = config.client_id; // Your client id
 var client_secret = config.client_secret; // Your secret
 var redirect_uri;
-if(process.env.NODE === "production") {
+if(process.env.NODE_ENV === "production") {
   redirect_uri = "https://nameless-stream-63268.herokuapp.com/callback";
 } else {
  redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
