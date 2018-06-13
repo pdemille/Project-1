@@ -99,16 +99,8 @@
       <div class="panel-heading panel-custom">
           Search Results
       </div>
-      <table class="table table-hover">
-          <tr>
-              <th scope="col">Title</th>
-              <th scope="col">Artist</th>
-              <th scope="col">Album</th>
-              <th scope="col"></th>
-              
-          </tr>
-          <tbody id="table-data"></tbody>
-      </table>
+      <div  id="search-results"></div>
+      
   </div>
 
   <div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="videoModal" aria-hidden="true">
@@ -327,6 +319,7 @@ var songAlbum = [j]+noSpace + "sngAlbum" + tId;
 var songArtist = [j]+noSpace + "sngArtist" + tId;
 var tableHead = [j]+noSpace + "head" + tId;
 var mvBtn = [j]+noSpace + "song" + tId;
+console.log(mvBtn);
 var tableWrapper  = [j]+noSpace + "wrap" + tId;
 var tableButton  = [j]+noSpace + "button" + tId;
 var albumArt = [j]+noSpace + "art" + tId;
@@ -462,18 +455,73 @@ $.ajax({
     'Authorization': 'Bearer ' + access_token
   },
   success: function(response) {
+
 console.log(response);
 $("#song-search").val("");
+
 var newTrack = response.tracks.items;
-console.log(newTrack);
 $.each(newTrack, function(i){
+var newTrackIndex = [i];
+var newImage = newTrack[i].album.images[1].url;
+var trackDiv = $('<div class="d-flex">');
+var searchTable = $('<table class="table table-hover">');
+var searchTableHead = $('<thead>');
+var searchTableBody = $('<tbody>');
+var searchTableRow2 = $('<tr>');
+var searchTablePlayer = $('<td>');
+var searchTableMv = $('<td>');
+var uniqueId = newTrackIndex + "song" + newTrack[i].track_number + "A" + newTrack[i].id;
+var uniqueId2 = newTrackIndex + "MV" + newTrack[i].track_number + "B" + newTrack[i].id;
+  $("#search-results").append(trackDiv);
+  trackDiv.append(searchTable);
+  searchTable.append(searchTableHead);
+  searchTableHead.append("<tr><th scope='col'>" + "Title" + "</th><th scope='col'>" + "Artist" + "</th><th scope='col'>" + "Album" + "</th><th scope='col'>" + "</th><th scope='col'>" + "</th></tr>"); 
+var searchImage = $('<img>');
+searchImage.attr("src", newImage);
+trackDiv.prepend(searchImage);
+searchTable.append(searchTableBody);
+searchTableRow2.attr("id", uniqueId);
+
+
+//make music video button and preview audio player
+var newMvButton = $('<button class="btn btn-primary music-video">');
+var newPvwPlayer = $('<audio controls preload="auto">');
+var newPreview = $('<source>');
+var newPreviewClip = newTrack[i].preview_url;
+console.log(newTrack);
+
 var newTitle = newTrack[i].name;
-var newImage = newTrack[i].album.images[2].url;
+
 var newAlbum = newTrack[i].album.name;
 console.log(newAlbum);
+var newArtists = newTrack[i].artists;
+var newArtistArr = [];
+$.each(newArtists, function(j){
+  var newMultiArtists = newArtists[j].name;
+  newArtistArr.push(newMultiArtists);
+})
+var newArtist = newArtistArr.join(', ');
+var videoSearchValue =  newArtists[0].name + newTitle + " official";
+console.log(newArtist);
+searchTableBody.append("<tr><td class='title'>" + newTitle + "</td><td class='artist'>" + newArtist + "</td><td class='album'>" + newAlbum + "</td></tr>");
+searchTableBody.append(searchTableRow2);
+$("#" + uniqueId).append(searchTablePlayer);
+$("#" + uniqueId).append(searchTableMv);
+searchTableMv.append(newMvButton)
+searchTablePlayer.append(newPvwPlayer);
+newPvwPlayer.append(newPreview);
+newPreview.attr("src", newPreviewClip);
+newMvButton.text("Music Video").attr({
+  id: uniqueId2,
+  "data-toggle": "modal",
+   "data-target": "#videoModal",
+   "data-video": videoSearchValue
+}); 
 
-//$("#train-table > tbody").append("<tr id='"+childSnapshot.key+"'><td>" + name + "</td><td>" + dest + "</td><td>" +
-    //freq + "</td><td>" + arrivalTime + "</td><td>" + timeMinTillTrain + "</td></tr>");
+//$().attr("id", newTrackIndex + newTitle);
+//searchTableBody.append()
+
+
 })
   }})
 })
