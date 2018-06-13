@@ -97,7 +97,7 @@
   
   <div class="panel panel-default">
       <div class="panel-heading panel-custom">
-          Playlists
+          Search Results
       </div>
       <table class="table table-hover">
           <tr>
@@ -307,7 +307,7 @@ var tableWrap = $('<div>');
 var trackButton = $('<td>');
 var trackPreview = $('<td>');
 var albumImg = $('<img class="img-thumbnail">');
-//var trackPlay = $('<button class="btn btn-primary preview">');
+
   //in css its possible to change size of controls so it only displays play button
 var audioClip = $('<audio controls preload="auto">');
 var playerAudio = $('<source>');
@@ -331,7 +331,7 @@ var tableWrapper  = [j]+noSpace + "wrap" + tId;
 var tableButton  = [j]+noSpace + "button" + tId;
 var albumArt = [j]+noSpace + "art" + tId;
 var songPreview = [j]+noSpace + "preview" + tId;
-//var songPlay = [j]+noSpace + "play" + tId;
+
 var songClip = [j]+noSpace + "clip" + tId;
 var aPlayer = [j]+noSpace + "player" + tId;
 
@@ -353,7 +353,7 @@ var tableButtonId  = "#" + tableButton;
 var tableWrapperId = "#" + tableWrapper;
 var albumArtId = "#" + albumArt;
 var songPreviewId = "#" + songPreview;
-//var songPlayId = "#" + songPlay;
+
 var songClipId = "#" + songClip;
 var aPlayerId = "#" + aPlayer;
 
@@ -385,7 +385,7 @@ tableWrap.attr("id", tableWrapper);
 trackButton.attr("id", tableButton);
 albumImg.attr("id", albumArt);
 trackPreview.attr("id", songPreview);
-//trackPlay.attr("id", songPlay).text("Play Song");
+
 audioClip.attr("id", songClip);
 playerAudio.attr("id", aPlayer);
 
@@ -407,14 +407,24 @@ $(tableDataRowId).append(trackPreview);
 $(tableDataRowId).append(trackButton);
 $(tableButtonId).append(mvButton);
 $(tableWrapperId).prepend(albumImg);
-//$(songPreviewId).append(trackPlay);
+
 $(songPreviewId).append(audioClip);
 $(songClipId).append(playerAudio);
 
 var title = trackList[j].track.name;
 var album = trackList[j].track.album.name;
- //figure out what to do if there is more than one artist in the artist array
-var artist = trackList[j].track.artists[0].name;
+
+ //handles when there is more than one artist credited for a track
+var artists = trackList[j].track.artists;
+var artistArr = [];
+$.each(artists, function(k){
+  var multiArtists = artists[k].name;
+  artistArr.push(multiArtists);
+})
+
+//adds spacing after the comma
+var artist = artistArr.join(', ');
+
 var albumArtImg = trackList[j].track.album.images[1].url;
 var videoSearchValue =  artist + title + " official";
 var previewClip = trackList[j].track.preview_url;
@@ -428,14 +438,7 @@ $(mvBtnId).text("Music Video").attr({
    "data-video": videoSearchValue
 }); 
 $(albumArtId).attr("src", albumArtImg);
-//$(songPlayId).attr({
-  //"data-value": previewClip,
-  //"type": "button",
- // "data-toggle": "button",
-  //"aria-pressed": "false",
-  //"autocomplete": "off"
-//});
-//$(songClipId).attr("src", previewClip);
+
 $(aPlayerId).attr("src", previewClip);
  
 })
@@ -454,13 +457,24 @@ console.log(name);
 var searchReady = name.replace(/\s/g, '%20');
 console.log(searchReady);
 $.ajax({
-  url: 'https://api.spotify.com/v1/search?q=' + searchReady + '&type=album,artist,playlist,track',
+  url: 'https://api.spotify.com/v1/search?q=' + searchReady + '&type=track&market=US',
   headers: {
     'Authorization': 'Bearer ' + access_token
   },
   success: function(response) {
 console.log(response);
 $("#song-search").val("");
+var newTrack = response.tracks.items;
+console.log(newTrack);
+$.each(newTrack, function(i){
+var newTitle = newTrack[i].name;
+var newImage = newTrack[i].album.images[2].url;
+var newAlbum = newTrack[i].album.name;
+console.log(newAlbum);
+
+//$("#train-table > tbody").append("<tr id='"+childSnapshot.key+"'><td>" + name + "</td><td>" + dest + "</td><td>" +
+    //freq + "</td><td>" + arrivalTime + "</td><td>" + timeMinTillTrain + "</td></tr>");
+})
   }})
 })
 
@@ -474,6 +488,12 @@ document.addEventListener('play', function(e){
     }
   }
 }, true);
+
+$(document).on("click", function(){
+  $($("li").children("a")).not($(".collapsed")).collapse({
+    toggle: false
+});
+})
 
 $(document).on("click", ".music-video", function(){
   console.log("works");
