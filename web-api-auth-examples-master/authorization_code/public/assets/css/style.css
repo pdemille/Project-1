@@ -45,4 +45,10 @@ box-sizing: border-box;
 }
 
 .results{border: 1px solid rgba(0, 0, 0, .125);
-border-radius: .25rem;}
+border-radius: .25rem;
+background-color: #212529;
+color: #fff;
+}
+th{
+  width: 350px;
+}

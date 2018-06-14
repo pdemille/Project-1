@@ -14,7 +14,7 @@ var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 var path = require("path");
 var config = require("./config.js");
-fs = require('fs')
+fs = require('fs');
 var lib = require(__dirname  + '/lib/helper.js');
 console.log(config)
 var client_id = config.client_id; // Your client id
