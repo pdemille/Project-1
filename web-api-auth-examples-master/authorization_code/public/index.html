@@ -13,13 +13,13 @@
     <link href="https://fonts.googleapis.com/css?family=Abril+Fatface" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
-    <!--link rel="stylesheet" type="text/css" href="assets/css/style.css"-->
+    <link rel="stylesheet" type="text/css" href="/assets/css/style.css">
     
 
 
     <title>Delta</title>
 
-    <style type="text/css">
+    <style>
         #login, #loggedin {
           display: none;
         }
@@ -65,6 +65,9 @@
     box-sizing: border-box;
   }
 
+.results{border: 1px solid rgba(0, 0, 0, .125);
+    border-radius: .25rem;}
+
       </style>
 
   </head>
@@ -94,29 +97,26 @@
 </div>
 
 <div class="container" id="dataBody">
+ 
   
-  <div class="panel panel-default">
-      <div class="panel-heading panel-custom">
-          Playlists
+  <div class="panel panel-default mb-3">
+      <div class="panel-heading panel-custom mb-3">
+        <a class="btn btn-primary" data-toggle="collapse" href="#collapseSearch" role="button" aria-expanded="false" aria-controls="collapseSearch">
+         Search Results
+        </a>
       </div>
-      <table class="table table-hover">
-          <tr>
-              <th scope="col">Title</th>
-              <th scope="col">Artist</th>
-              <th scope="col">Album</th>
-              <th scope="col"></th>
-              
-          </tr>
-          <tbody id="table-data"></tbody>
-      </table>
-  </div>
+      <div class="collapse show" id="collapseSearch">
+        <div  id="search-results">
+        </div>
+      
+      </div>
 
   <div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="videoModal" aria-hidden="true">
       <div class="modal-dialog" id="sizeModal">
         <div class="modal-content">
           <div class="modal-body">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <div>
+            <div id="player">
               <iframe width="100%" height="800" src=""></iframe>
             </div>
           </div>
@@ -129,8 +129,8 @@
     <div class="panel-body">
         <form>
             <div class="form-group">
-                <label for="endYear">Search</label>
-                <input type="text" class="form-control" id="time-freq">
+                <label for="song-search">Search</label>
+                <input type="text" class="form-control" id="song-search">
             </div>
             <div class="btn-group" role="group">
                 <button type="button" id="btn-add" class="btn search-button">Submit</button>
@@ -138,6 +138,10 @@
         </form>
     </div>
 </div>
+
+
+
+
 <script id="oauth-template" type="text/x-handlebars-template">
     <h2>oAuth info</h2>
     <dl class="dl-horizontal">
@@ -146,6 +150,9 @@
     </dl>
   </script>
   
+
+
+
   <script>
     
     (function() {
@@ -163,8 +170,7 @@
         }
         return hashParams;
       }
-var songPlaying = false;
-var audioReady = false;
+
       var params = getHashParams();
 
       var access_token = params.access_token,
@@ -301,7 +307,7 @@ var tableWrap = $('<div>');
 var trackButton = $('<td>');
 var trackPreview = $('<td>');
 var albumImg = $('<img class="img-thumbnail">');
-//var trackPlay = $('<button class="btn btn-primary preview">');
+
   //in css its possible to change size of controls so it only displays play button
 var audioClip = $('<audio controls preload="auto">');
 var playerAudio = $('<source>');
@@ -321,11 +327,12 @@ var songAlbum = [j]+noSpace + "sngAlbum" + tId;
 var songArtist = [j]+noSpace + "sngArtist" + tId;
 var tableHead = [j]+noSpace + "head" + tId;
 var mvBtn = [j]+noSpace + "song" + tId;
+console.log(mvBtn);
 var tableWrapper  = [j]+noSpace + "wrap" + tId;
 var tableButton  = [j]+noSpace + "button" + tId;
 var albumArt = [j]+noSpace + "art" + tId;
 var songPreview = [j]+noSpace + "preview" + tId;
-//var songPlay = [j]+noSpace + "play" + tId;
+
 var songClip = [j]+noSpace + "clip" + tId;
 var aPlayer = [j]+noSpace + "player" + tId;
 
@@ -347,7 +354,7 @@ var tableButtonId  = "#" + tableButton;
 var tableWrapperId = "#" + tableWrapper;
 var albumArtId = "#" + albumArt;
 var songPreviewId = "#" + songPreview;
-//var songPlayId = "#" + songPlay;
+
 var songClipId = "#" + songClip;
 var aPlayerId = "#" + aPlayer;
 
@@ -359,7 +366,10 @@ songToggle.attr({
  });
 
 innerCollapseDiv.attr("id", innerDiv);
-songInfoDiv.attr("id", songToggler);
+songInfoDiv.attr({
+  id: songToggler,
+  "data-parent": plSongListId
+});
 songInfoTable.attr("id", songInfoTabler);
 if(tableAlbumId){
 tableHeadAlbum.text("Album").attr("id", tableAlbumId);
@@ -376,7 +386,7 @@ tableWrap.attr("id", tableWrapper);
 trackButton.attr("id", tableButton);
 albumImg.attr("id", albumArt);
 trackPreview.attr("id", songPreview);
-//trackPlay.attr("id", songPlay).text("Play Song");
+
 audioClip.attr("id", songClip);
 playerAudio.attr("id", aPlayer);
 
@@ -398,14 +408,24 @@ $(tableDataRowId).append(trackPreview);
 $(tableDataRowId).append(trackButton);
 $(tableButtonId).append(mvButton);
 $(tableWrapperId).prepend(albumImg);
-//$(songPreviewId).append(trackPlay);
+
 $(songPreviewId).append(audioClip);
 $(songClipId).append(playerAudio);
 
 var title = trackList[j].track.name;
 var album = trackList[j].track.album.name;
- //figure out what to do if there is more than one artist in the artist array
-var artist = trackList[j].track.artists[0].name;
+
+ //handles when there is more than one artist credited for a track
+var artists = trackList[j].track.artists;
+var artistArr = [];
+$.each(artists, function(k){
+  var multiArtists = artists[k].name;
+  artistArr.push(multiArtists);
+})
+
+//adds spacing after the comma
+var artist = artistArr.join(', ');
+
 var albumArtImg = trackList[j].track.album.images[1].url;
 var videoSearchValue =  artist + title + " official";
 var previewClip = trackList[j].track.preview_url;
@@ -419,14 +439,7 @@ $(mvBtnId).text("Music Video").attr({
    "data-video": videoSearchValue
 }); 
 $(albumArtId).attr("src", albumArtImg);
-//$(songPlayId).attr({
-  //"data-value": previewClip,
-  //"type": "button",
- // "data-toggle": "button",
-  //"aria-pressed": "false",
-  //"autocomplete": "off"
-//});
-//$(songClipId).attr("src", previewClip);
+
 $(aPlayerId).attr("src", previewClip);
  
 })
@@ -437,12 +450,91 @@ $(aPlayerId).attr("src", previewClip);
 }(i))
 }
 
+$("#btn-add").on("click", function(event){
+event.preventDefault();
+
+var name = $("#song-search").val().trim();
+console.log(name);
+var searchReady = name.replace(/\s/g, '%20');
+console.log(searchReady);
+$.ajax({
+  url: 'https://api.spotify.com/v1/search?q=' + searchReady + '&type=track&market=US',
+  headers: {
+    'Authorization': 'Bearer ' + access_token
+  },
+  success: function(response) {
+
+console.log(response);
+$("#song-search").val("");
+
+var newTrack = response.tracks.items;
+$.each(newTrack, function(i){
+var newTrackIndex = [i];
+var newImage = newTrack[i].album.images[1].url;
+var trackDiv = $('<div class="d-flex results mb-3">');
+var searchTable = $('<table class="table table-hover">');
+var searchTableHead = $('<thead>');
+var searchTableBody = $('<tbody>');
+var searchTableRow2 = $('<tr>');
+var searchTablePlayer = $('<td>');
+var searchTableMv = $('<td>');
+var uniqueId = newTrackIndex + "song" + newTrack[i].track_number + "A" + newTrack[i].id;
+var uniqueId2 = newTrackIndex + "MV" + newTrack[i].track_number + "B" + newTrack[i].id;
+  $("#search-results").append(trackDiv);
+  trackDiv.append(searchTable);
+  searchTable.append(searchTableHead);
+  searchTableHead.append("<tr><th scope='col'>" + "Title" + "</th><th scope='col'>" + "Artist" + "</th><th scope='col'>" + "Album" + "</th><th scope='col'>" + "</th><th scope='col'>" + "</th></tr>"); 
+var searchImage = $('<img>');
+searchImage.attr("src", newImage);
+trackDiv.prepend(searchImage);
+searchTable.append(searchTableBody);
+searchTableRow2.attr("id", uniqueId);
 
 
-//$(document).ready(function(){
-  
-//});
+//make music video button and preview audio player
+var newMvButton = $('<button class="btn btn-primary music-video">');
+var newPvwPlayer = $('<audio controls preload="auto">');
+var newPreview = $('<source>');
+var newPreviewClip = newTrack[i].preview_url;
+console.log(newTrack);
 
+var newTitle = newTrack[i].name;
+
+var newAlbum = newTrack[i].album.name;
+console.log(newAlbum);
+var newArtists = newTrack[i].artists;
+var newArtistArr = [];
+$.each(newArtists, function(j){
+  var newMultiArtists = newArtists[j].name;
+  newArtistArr.push(newMultiArtists);
+})
+var newArtist = newArtistArr.join(', ');
+var videoSearchValue =  newArtists[0].name + newTitle + " official";
+console.log(newArtist);
+searchTableBody.append("<tr><td class='title'>" + newTitle + "</td><td class='artist'>" + newArtist + "</td><td class='album'>" + newAlbum + "</td></tr>");
+searchTableBody.append(searchTableRow2);
+$("#" + uniqueId).append(searchTablePlayer);
+$("#" + uniqueId).append(searchTableMv);
+searchTableMv.append(newMvButton)
+searchTablePlayer.append(newPvwPlayer);
+newPvwPlayer.append(newPreview);
+newPreview.attr("src", newPreviewClip);
+newMvButton.text("Music Video").attr({
+  id: uniqueId2,
+  "data-toggle": "modal",
+   "data-target": "#videoModal",
+   "data-video": videoSearchValue
+}); 
+
+
+
+
+})
+  }})
+})
+
+
+//keeps two tracks from playing at the same time
 document.addEventListener('play', function(e){
   var audios = document.getElementsByTagName('audio');
   for(var i = 0, len = audios.length; i < len; i++){
@@ -452,7 +544,20 @@ document.addEventListener('play', function(e){
   }
 }, true);
 
+$(document).on("click", function(){
+  $($("li").children("a")).not($(".collapsed")).collapse({
+    toggle: false
+});
+})
 
+$(document).on("click", ".music-video", function(){
+  console.log("works");
+  var audios = document.getElementsByTagName('audio');
+  for(var i = 0, len = audios.length; i < len; i++){
+    if(audios[i].paused != true){
+    audios[i].pause();}
+    }
+  })
 
     $('#login').hide();
     $('#loggedin').show();
@@ -467,20 +572,7 @@ document.addEventListener('play', function(e){
             $('#loggedin').hide();
         }
       
-        //document.getElementById('obtain-new-token').addEventListener('click', function() {
-        //  $.ajax({
-        //    url: '/refresh_token',
-        //    data: {
-        //      'refresh_token': refresh_token
-        //    }
-        //  }).done(function(data) {
-        //    access_token = data.access_token;
-        //    //oauthPlaceholder.innerHTML = oauthTemplate({
-        //      //access_token: access_token,
-        //     // refresh_token: refresh_token
-        //   // });
-        //  });
-        //}, false);
+        
       }
     })();
   
@@ -516,6 +608,14 @@ gapi.load('client', start);
 
   }) 
 
+
+
+
+
+
+
+
+
 function autoPlayYouTubeModal(buttonId){
   
     var theModal = $("#" + buttonId).data( "target" ),
@@ -529,6 +629,9 @@ function autoPlayYouTubeModal(buttonId){
        
   });
 }
+
+
+
     })
 
 
@@ -546,10 +649,7 @@ function autoPlayYouTubeModal(buttonId){
   </script>
 
 
-<script>
-  
 
-</script>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
 
