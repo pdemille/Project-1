@@ -31,7 +31,7 @@
                   </div>
                   <div id="oauth">
                   </div>
-                  
+                 <!--button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button-->
                 </div>
               </div>
     <div class="jumbotron" id="head">
@@ -396,15 +396,21 @@
   })
   }(i))
   }
-$("#btn-add").one("click", function(){
+$(document).one("click", "#btn-add", function(){
+  if($("#song-search").val().trim() === ""){
+return false;
+  } else {
   $("#results-button").removeAttr("style");
+}
 })
 $("#btn-add").on("click", function(event){
 event.preventDefault();
 
 var name = $("#song-search").val().trim();
 console.log(name);
-
+if(name === ""){
+  return false;
+} else{
 var searchReady = name.replace(/\s/g, '%20');
 console.log(searchReady);
 
@@ -415,11 +421,73 @@ $.ajax({
     'Authorization': 'Bearer ' + access_token
   },
   success: function(response) {
+    var results = response.tracks;
+var queryURL = response.tracks.next;
+var nextButton = $('<button  type="button" id="btn-next" class="btn btn-primary searchNav">' + '</button>');
+var prevButton = $('<button  type="button" id="btn-prev" class="btn btn-primary searchNav" disabled>' + '</button>');
+$("#collapseSearch").append(prevButton);
+$("#collapseSearch").append(nextButton);
+//prevButton.text("Prev.").attr("data-value", results.previous);
+//nextButton.text("Next.").attr("data-value", results.next);
+$("#btn-next").attr("data-value", response.tracks.next);
 
-console.log(response);
+
+
+
+
 $("#song-search").val("");
-
+nextButton.text("Next.");
+prevButton.text("Prev.");
 var newTrack = response.tracks.items;
+renderResults(newTrack);
+
+
+$(document).on("click", ".searchNav", function(){
+   if($(this).attr("data-value") === null){
+      $(this).attr("disabled", true);
+    } else {
+      $(this).attr("disabled", false);
+      //$("#btn-prev").attr("disabled", false);
+      console.log($(this).data("value"));
+  $.ajax({
+  url: $(this).attr("data-value"),
+  headers: {
+    'Authorization': 'Bearer ' + access_token
+  },
+  success: function(result) {
+console.log(result);
+
+var newNext = result.tracks.next;
+var newPrev = result.tracks.previous;
+console.log(newNext);
+$("#btn-prev").attr("data-value", newPrev);
+$("#btn-next").attr("data-value", newNext);
+if(newPrev === null){
+  $("#btn-prev").attr("disabled", true);
+} else {
+  $("#btn-prev").attr("disabled", false);
+}
+var moreTracks = result.tracks.items;
+renderResults(moreTracks);
+  }
+})
+}})
+}
+
+})
+}
+})
+
+
+
+
+
+function renderResults(newTrack){
+  $("#search-results").empty();
+  //if($("#btn-prev").attr("data-value") === null){
+     // $("#btn-prev").attr("disabled", true);
+   // } else {
+      //$("#btn-prev").attr("disabled", false);}
 $.each(newTrack, function(i){
 var newTrackIndex = [i];
 var newImage = newTrack[i].album.images[1].url;
@@ -464,8 +532,6 @@ $.each(newArtists, function(j){
 var newArtist = newArtistArr.join(', ');
 var videoSearchValue =  newArtists[0].name + newTitle + " official";
 
-console.log(newArtist);
-
 searchTableBody.append("<tr><td class='title'>" + newTitle + "</td><td class='artist'>" + newArtist + "</td><td class='album'>" + newAlbum + "</td></tr>");
 searchTableBody.append(searchTableRow2);
 $("#" + uniqueId).append(searchTablePlayer);
@@ -487,8 +553,9 @@ newMvButton.text("Music Video").attr({
 
 
 })
-  }})
-})
+}
+
+
 
 
 //keeps two tracks from playing at the same time
@@ -528,7 +595,21 @@ $(document).on("click", ".music-video", function(){
             $('#login').show();
             $('#loggedin').hide();
         }
-      
+
+        //document.getElementById('obtain-new-token').addEventListener('click', function() {
+        //    $.ajax({
+        //      url: '/refresh_token',
+        //      data: {
+        //        'refresh_token': refresh_token
+        //      }
+        //    }).done(function(data) {
+        //      access_token = data.access_token;
+        //      oauthPlaceholder.innerHTML = oauthTemplate({
+        //        access_token: access_token,
+        //        refresh_token: refresh_token
+        //      });
+        //    });
+        //  }, false);
         
       }
     })();
