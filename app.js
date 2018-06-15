@@ -14,6 +14,8 @@ var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 var path = require("path");
 var config = require("./config.js");
+fs = require('fs');
+var lib = require(__dirname  + '/lib/helper.js');
 console.log(config)
 var client_id = config.client_id; // Your client id
 var client_secret = config.client_secret; // Your secret
@@ -48,14 +50,23 @@ var generateRandomString = function(length) {
 var stateKey = 'spotify_auth_state';
 
 var app = express();
+app.use(cors())
+app.use(cookieParser());
 
-app.use(express.static(__dirname + './web-api-auth-examples-master/authorization_code/public'))    
-   .use(cors())
-   .use(cookieParser());
+app.use(express.static(__dirname + '/web-api-auth-examples-master/authorization_code/public'))    
+ app.get('/', function(request, response){
+   response.sendFile(path.join(__dirname, "./web-api-auth-examples-master/authorization_code/public/index.html"))
+ })
 
-   app.get('/', function(request, response){
-    response.sendFile(path.join(__dirname, "./web-api-auth-examples-master/authorization_code/public/index.html"))
-   })
+ app.get('/*.*', function(req, res) {
+
+  var options = url.parse(req.url, true);
+
+  var mime = Helper.getMime(options);
+  
+  serveFile(res, options.pathname, mime);
+
+});
 
 app.get('/login', function(req, res) {
 
@@ -84,6 +95,7 @@ app.get('/callback', function(req, res) {
   var state = req.query.state || null;
   var storedState = req.cookies ? req.cookies[stateKey] : null;
 
+  console.log(state);
   if (state === null || state !== storedState) {
     res.redirect('/#' +
       querystring.stringify({
