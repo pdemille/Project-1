@@ -287,14 +287,10 @@
     success: function(response) {
         var results = response.tracks;
         var queryURL = response.tracks.next;
-        var nextButton = $('<button  href="#" type="button" id="btn-next" class="btn btn-primary searchNav">' + '</button>');
-        var prevButton = $('<button href="#" type="button" id="btn-prev" class="btn btn-primary searchNav" disabled>' + '</button>');
-        $("#collapseSearch").append(prevButton);
-        $("#collapseSearch").append(nextButton);
         $("#btn-next").attr("data-value", response.tracks.next);
         $("#song-search").val("");
-        nextButton.text("Next.");
-        prevButton.text("Prev.");
+        $("#btn-next").show();
+        $("#btn-prev").show();
         var newTrack = response.tracks.items;
         renderResults(newTrack);
   

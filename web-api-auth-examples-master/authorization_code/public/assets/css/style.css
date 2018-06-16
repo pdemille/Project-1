@@ -1,4 +1,5 @@
 body{background-color:#f3b900;}
+
 #login, #loggedin {
   display: none;
 }
@@ -52,3 +53,13 @@ color: #fff;
 th{
   width: 350px;
 }
+
+.modal-body{
+  background-color: #212529;
+color: #fff;
+}
+a{font-family: 'Abril Fatface', cursive;
+  ;}
+  label{font-family: 'Abril Fatface', cursive;}
+  button{font-family: 'Abril Fatface', cursive;}
+  #btn-prev, #btn-next{display: none;}
