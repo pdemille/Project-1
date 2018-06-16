@@ -31,7 +31,7 @@
                   </div>
                   <div id="oauth">
                   </div>
-                 <!--button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button-->
+                  
                 </div>
               </div>
     <div class="jumbotron" id="head">
@@ -41,7 +41,25 @@
 </div>
 
 <div class="container" id="dataBody">
- 
+    <div class="modal fade" id="expireModal" tabindex="-1" role="dialog" aria-labelledby="expireModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="expireModalLabel"></h5>
+              <button id="xButton" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              You still there?
+            </div>
+            <div class="modal-footer">
+           
+              <button class="btn btn-default" id="obtain-new-token" data-dismiss="modal">Obtain new token using the refresh token</button>
+            </div>
+          </div>
+        </div>
+      </div>
   
   <div class="panel panel-default mb-3">
       <div class="panel-heading panel-custom mb-3">
@@ -94,7 +112,8 @@
     </dl>
   </script>
   
-
+  <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
+  <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
 
 
   <script>
@@ -120,12 +139,18 @@
       var access_token = params.access_token,
           refresh_token = params.refresh_token,
           error = params.error;
+      
 
       if (error) {
         alert('There was an error during the authentication');
       } else {
         if (access_token) {
         
+//make a timeout that triggers a function after 60minutes targets the modal to pop up
+setTimeout(function () {$("#expireModal").modal('show');}, 3600000);
+$("#xButton").on("click", function(){
+  $("#login").show();
+})
           $.ajax({
     url: 'https://api.spotify.com/v1/me/playlists',
     headers: {
@@ -596,20 +621,18 @@ $(document).on("click", ".music-video", function(){
             $('#loggedin').hide();
         }
 
-        //document.getElementById('obtain-new-token').addEventListener('click', function() {
-        //    $.ajax({
-        //      url: '/refresh_token',
-        //      data: {
-        //        'refresh_token': refresh_token
-        //      }
-        //    }).done(function(data) {
-        //      access_token = data.access_token;
-        //      oauthPlaceholder.innerHTML = oauthTemplate({
-        //        access_token: access_token,
-        //        refresh_token: refresh_token
-        //      });
-        //    });
-        //  }, false);
+        document.getElementById('obtain-new-token').addEventListener('click', function() {
+            $.ajax({
+              url: '/refresh_token',
+              data: {
+                'refresh_token': refresh_token
+              }
+            }).done(function(data) {
+              access_token = data.access_token;
+              
+         
+            });
+          }, false);
         
       }
     })();
