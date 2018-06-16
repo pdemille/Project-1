@@ -162,7 +162,7 @@
                 var tableDataRow3 = $('<tr>');
                 var trackAlbum = $('<td>');
                 var trackArtist = $('<td>');
-                var mvButton = $('<button class="btn btn-primary music-video">')
+                var mvButton = $('<button class="btn  music-video">')
                 var tableWrap = $('<div class="d-flex results">');
                 var trackButton = $('<td>');
                 var trackPreview = $('<td>');
@@ -287,14 +287,10 @@
     success: function(response) {
         var results = response.tracks;
         var queryURL = response.tracks.next;
-        var nextButton = $('<button  href="#" type="button" id="btn-next" class="btn btn-primary searchNav">' + '</button>');
-        var prevButton = $('<button href="#" type="button" id="btn-prev" class="btn btn-primary searchNav" disabled>' + '</button>');
-        $("#collapseSearch").append(prevButton);
-        $("#collapseSearch").append(nextButton);
         $("#btn-next").attr("data-value", response.tracks.next);
         $("#song-search").val("");
-        nextButton.text("Next.");
-        prevButton.text("Prev.");
+        $("#btn-next").show();
+        $("#btn-prev").show();
         var newTrack = response.tracks.items;
         renderResults(newTrack);
   
@@ -362,7 +358,7 @@
         searchTableRow3.attr("id", uniqueId2);
   
         //make music video button and preview audio player
-        var newMvButton = $('<button class="btn btn-primary music-video">');
+        var newMvButton = $('<button class="btn music-video">');
         var newPvwPlayer = $('<audio controls preload="auto">');
         var newPreview = $('<source>');
         var newPreviewClip = newTrack[i].preview_url;
