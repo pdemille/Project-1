@@ -203,7 +203,7 @@
                 innerCollapseDiv.attr("id", innerDiv);
                 songInfoDiv.attr({
                     id: songToggler,
-                    "data-parent": "#" + plSongListstId
+                    "data-parent": "#" + plSongList
                 });
                 songInfoTable.attr("id", songInfoTabler);
                 tableHeadAlbum.text("Album").attr("id", "#" + tableAlbum);
@@ -287,8 +287,8 @@
     success: function(response) {
         var results = response.tracks;
         var queryURL = response.tracks.next;
-        var nextButton = $('<button  type="button" id="btn-next" class="btn btn-primary searchNav">' + '</button>');
-        var prevButton = $('<button  type="button" id="btn-prev" class="btn btn-primary searchNav" disabled>' + '</button>');
+        var nextButton = $('<button  href="#" type="button" id="btn-next" class="btn btn-primary searchNav">' + '</button>');
+        var prevButton = $('<button href="#" type="button" id="btn-prev" class="btn btn-primary searchNav" disabled>' + '</button>');
         $("#collapseSearch").append(prevButton);
         $("#collapseSearch").append(nextButton);
         $("#btn-next").attr("data-value", response.tracks.next);
