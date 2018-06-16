@@ -168,7 +168,9 @@ app.get('/refresh_token', function(req, res) {
       var access_token = body.access_token;
       res.send({
         'access_token': access_token
+        
       });
+      console.log(access_token);
     }
   });
 });
