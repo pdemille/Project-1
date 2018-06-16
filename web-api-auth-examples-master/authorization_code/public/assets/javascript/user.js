@@ -162,7 +162,7 @@
                 var tableDataRow3 = $('<tr>');
                 var trackAlbum = $('<td>');
                 var trackArtist = $('<td>');
-                var mvButton = $('<button class="btn btn-primary music-video">')
+                var mvButton = $('<button class="btn  music-video">')
                 var tableWrap = $('<div class="d-flex results">');
                 var trackButton = $('<td>');
                 var trackPreview = $('<td>');
@@ -358,7 +358,7 @@
         searchTableRow3.attr("id", uniqueId2);
   
         //make music video button and preview audio player
-        var newMvButton = $('<button class="btn btn-primary music-video">');
+        var newMvButton = $('<button class="btn music-video">');
         var newPvwPlayer = $('<audio controls preload="auto">');
         var newPreview = $('<source>');
         var newPreviewClip = newTrack[i].preview_url;

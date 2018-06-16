@@ -1,4 +1,7 @@
-body{background-color:#f3b900;}
+body {
+  background-color:#f3b900;
+  color: black;
+}
 
 #login, #loggedin {
   display: none;
@@ -53,13 +56,17 @@ color: #fff;
 th{
   width: 350px;
 }
+.card{background-color:#212529}
 
 .modal-body{
   background-color: #212529;
 color: #fff;
 }
-a{font-family: 'Abril Fatface', cursive;
+.display-4{color: #fff;}
+a 
+{font-family: 'Abril Fatface', cursive;
   ;}
   label{font-family: 'Abril Fatface', cursive;}
   button{font-family: 'Abril Fatface', cursive;}
   #btn-prev, #btn-next{display: none;}
+  .button{background-color: #fff;}
